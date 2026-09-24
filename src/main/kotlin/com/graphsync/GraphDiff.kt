@@ -38,7 +38,13 @@ object GraphDiff {
                     currentNodes.remove(it.node)
                     currentEdges.removeIf { edge -> edge.first == it.node || edge.second == it.node }
                 }
-                is SyncOp.AddEdge -> currentEdges.add(it.from to it.to)
+                is SyncOp.AddEdge -> {
+                    if (currentNodes.contains(it.from) && currentNodes.contains(it.to)) {
+                        currentEdges.add(it.from to it.to)
+                    } else {
+                        throw IllegalArgumentException("Cannot add edge between non-existent nodes: ${it.from} -> ${it.to}")
+                    }
+                }
                 is SyncOp.RemoveEdge -> currentEdges.remove(it.from to it.to)
             }
         }
