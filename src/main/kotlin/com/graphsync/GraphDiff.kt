@@ -4,24 +4,24 @@ object GraphDiff {
     fun <T> calculateDiff(source: Graph<T>, target: Graph<T>): List<SyncOp<T>> {
         val ops = mutableListOf<SyncOp<T>>()
 
-        // Nodes to remove (in target but not in source)
-        target.nodes.filter { it !in source.nodes }.forEach {
-            ops.add(SyncOp.RemoveNode(it))
-        }
-
-        // Nodes to add (in source but not in target)
+        // 1. Nodes to add
         source.nodes.filter { it !in target.nodes }.forEach {
             ops.add(SyncOp.AddNode(it))
         }
 
-        // Edges to remove (in target but not in source)
+        // 2. Edges to add
+        source.edges.filter { it !in target.edges }.forEach {
+            ops.add(SyncOp.AddEdge(it.first, it.second))
+        }
+
+        // 3. Edges to remove
         target.edges.filter { it !in source.edges }.forEach {
             ops.add(SyncOp.RemoveEdge(it.first, it.second))
         }
 
-        // Edges to add (in source but not in target)
-        source.edges.filter { it !in target.edges }.forEach {
-            ops.add(SyncOp.AddEdge(it.first, it.second))
+        // 4. Nodes to remove
+        target.nodes.filter { it !in source.nodes }.forEach {
+            ops.add(SyncOp.RemoveNode(it))
         }
 
         return ops
